@@ -199,7 +199,7 @@ lib.makeScope pkgs.newScope (self: {
       baseOverlay = self: super:
         let
           lockPkgs = builtins.listToAttrs (
-            builtins.map
+            builtins.concatMap
               (
                 pkgMeta:
                 let 

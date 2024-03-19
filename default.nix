@@ -202,10 +202,9 @@ lib.makeScope pkgs.newScope (self: {
             builtins.map
               (
                 pkgMeta:
-                let normalizedName = normalizePackageName pkgMeta.name; in
-                {
-                  name = normalizedName;
-                  value = self.mkPoetryDep (
+                let 
+                  normalizedName = normalizePackageName pkgMeta.name;
+                  dep = builtins.tryEval (self.mkPoetryDep (
                     pkgMeta // {
                       inherit pwd preferWheels;
                       pos = poetrylockPos;
@@ -219,8 +218,12 @@ lib.makeScope pkgs.newScope (self: {
                         or (normalizePackageSet pyProject.tool.poetry.group.dev.dependencies or { }).${normalizedName} # Poetry 1.2.0+
                         or { };
                     }
-                  );
-                }
+                  ));
+                in
+                  if dep.success then [ {
+                    name = normalizedName;
+                    value = dep.value;
+                  } ] else []
               )
               (lib.reverseList compatible)
           );

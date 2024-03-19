@@ -204,7 +204,7 @@ lib.makeScope pkgs.newScope (self: {
                 pkgMeta:
                 let 
                   normalizedName = normalizePackageName pkgMeta.name;
-                  dep = builtins.tryEval (self.mkPoetryDep (
+                  dep = builtins.tryEval (super.mkPoetryDep (
                     pkgMeta // {
                       inherit pwd preferWheels;
                       pos = poetrylockPos;

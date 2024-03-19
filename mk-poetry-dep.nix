@@ -91,24 +91,24 @@ pythonPackages.callPackage
           entries = (if preferWheel' then binaryDist ++ sourceDist else sourceDist ++ binaryDist) ++ eggs;
           lockFileEntry =
             if lib.length entries > 0 then builtins.head entries
-            else throw "Missing suitable source/wheel file entry for ${name}"
+            else null
           ;
           _isEgg = isEgg lockFileEntry;
         in
-        rec {
-          inherit (lockFileEntry) file hash;
-          name = file;
-          format =
-            if _isEgg then "egg"
-            else if lib.strings.hasSuffix ".whl" name then "wheel"
-            else "pyproject";
-        };
+          if lockFileEntry != null then rec {
+            inherit (lockFileEntry) file hash;
+            name = file;
+            format =
+              if _isEgg then "egg"
+              else if lib.strings.hasSuffix ".whl" name then "wheel"
+              else "pyproject";
+          } else null;
 
       format = if isWheelUrl then "wheel" else if isDirectory || isGit || isUrl then "pyproject" else fileInfo.format;
 
       hooks = python.pkgs.callPackage ./hooks { };
     in
-    buildPythonPackage {
+    if fileInfo == null then null else buildPythonPackage {
       inherit pname version;
 
       # Circumvent output separation (https://github.com/NixOS/nixpkgs/pull/190487)

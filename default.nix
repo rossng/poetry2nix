@@ -204,7 +204,7 @@ lib.makeScope pkgs.newScope (self: {
                 pkgMeta:
                 let 
                   normalizedName = normalizePackageName pkgMeta.name;
-                  dep_ = (self.mkPoetryDep (
+                  value = (self.mkPoetryDep (
                     pkgMeta // {
                       inherit pwd preferWheels;
                       pos = poetrylockPos;
@@ -219,11 +219,10 @@ lib.makeScope pkgs.newScope (self: {
                         or { };
                     }
                   ));
-                  dep = builtins.tryEval (builtins.deepSeq dep_ dep_);
                 in
-                  if dep.success then [ {
+                  if value != null then [ {
                     name = normalizedName;
-                    value = dep.value;
+                    value = value;
                   } ] else []
               )
               (lib.reverseList compatible)

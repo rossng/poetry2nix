@@ -199,7 +199,7 @@ lib.makeScope pkgs.newScope (self: {
       baseOverlay = self: super:
         let
           lockPkgs = builtins.listToAttrs (
-            builtins.concatMap
+            builtins.map
               (
                 pkgMeta:
                 let 
@@ -220,10 +220,10 @@ lib.makeScope pkgs.newScope (self: {
                     }
                   ));
                 in
-                  if value != null then [ {
+                  if value != null then {
                     name = normalizedName;
                     value = value;
-                  } ] else []
+                  } else null
               )
               (lib.reverseList compatible)
           );

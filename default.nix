@@ -204,7 +204,7 @@ lib.makeScope pkgs.newScope (self: {
                 pkgMeta:
                 let 
                   normalizedName = normalizePackageName pkgMeta.name;
-                  dep = builtins.tryEval (builtins.deepSeq (self.mkPoetryDep (
+                  dep_ = (self.mkPoetryDep (
                     pkgMeta // {
                       inherit pwd preferWheels;
                       pos = poetrylockPos;
@@ -218,7 +218,8 @@ lib.makeScope pkgs.newScope (self: {
                         or (normalizePackageSet pyProject.tool.poetry.group.dev.dependencies or { }).${normalizedName} # Poetry 1.2.0+
                         or { };
                     }
-                  )));
+                  ));
+                  dep = builtins.tryEval (builtins.deepSeq dep_ dep_);
                 in
                   if dep.success then [ {
                     name = normalizedName;
